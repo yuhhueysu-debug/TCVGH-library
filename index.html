@@ -163,7 +163,7 @@
             display: none;
         }
 
-        #completion-page img {
+        #completion-page img, #start-page img {
             width: 100px;
             height: auto;
             margin-bottom: 20px;
@@ -176,11 +176,17 @@
     
     <!-- 遊戲首頁 -->
     <div id="start-page" class="page">
+        <p>
+            <img src="images/好兔學生.png" alt="好兔哥圖標">
+        </p>
         <h1>醫學偵探大作戰</h1>
         <h2>資料庫尋寶之旅</h2>
-        <p>成為圖書館最強的醫學偵探，解鎖隱藏在資料庫中的秘密！</p>
+        <p>
+            我是圖書館的吉祥物「好兔哥」，為了幫助大家更有效率地尋找資料，我準備了一場特別的冒險！
+            只要你跟著我的指示，感應每個 NFC 關卡，回答問題，就能成為最強的醫學偵探喔！
+        </p>
         <div class="button-group">
-            <button id="startButton">開始遊戲</button>
+            <button id="startButton">開始挑戰</button>
         </div>
         <p>
             <br/>
@@ -208,12 +214,15 @@
 
     <!-- 遊戲結束頁面 -->
     <div id="completion-page" class="page hidden">
-        <h1>任務完成！</h1>
         <p>
-            <img src="https://placehold.co/100x100/3498db/ffffff?text=%E2%98%85" alt="完成圖標">
+            <img src="images/好兔學生.png" alt="好兔哥圖標">
         </p>
-        <h2>你已成為醫學資料庫大師！</h2>
-        <p>恭喜你！你已經掌握了圖書館最重要的醫學資料庫。現在，帶著你的手機回到圖書館服務台，向館員展示此頁面，即可領取你的榮譽獎勵！</p>
+        <h1>任務完成！</h1>
+        <h2>恭喜你，你已成為醫學資料庫大師！</h2>
+        <p>
+            太棒了！你真是個了不起的醫學偵探！
+            你已經掌握了圖書館最重要的醫學資料庫。現在，帶著你的手機回到圖書館服務台，向館員展示此頁面，就可以領取你應得的榮譽獎勵囉！
+        </p>
     </div>
 
 </div>
@@ -301,38 +310,49 @@
 
     // 處理遊戲邏輯
     function initGame() {
-        // 綁定提交按鈕點擊事件
-        submitButton.onclick = () => {
-            const levelData = gameLevels[currentLevel];
-            const userAnswer = answerInput.value.trim().toLowerCase();
-            
-            // 檢查使用者答案是否在正確答案陣列中
-            const isCorrect = levelData.answer.some(correctAnswer => userAnswer === correctAnswer.trim().toLowerCase());
-
-            if (isCorrect) {
-                showMessage('success', '恭喜你！答案正確！');
-                setTimeout(() => {
-                    currentLevel++;
-                    renderLevel(currentLevel);
-                }, 1000);
-            } else {
-                showMessage('error', '喔不！答案似乎不太對，請再試一次。');
-                container.classList.add('shaking');
-                setTimeout(() => {
-                    container.classList.remove('shaking');
-                }, 500);
-            }
-        };
-
-        // 綁定起始按鈕點擊事件
-        startButton.addEventListener('click', () => {
-            currentLevel = 1;
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLevel = urlParams.get('level');
+        if (urlLevel && gameLevels[urlLevel]) {
+            currentLevel = parseInt(urlLevel);
             renderLevel(currentLevel);
-        });
-
-        // 遊戲初始化時，顯示起始頁
-        showPage('start-page');
+        } else {
+            // 如果沒有 level 參數，或 level 不存在，顯示起始頁
+            showPage('start-page');
+        }
     }
+
+    // 綁定提交按鈕點擊事件
+    submitButton.onclick = () => {
+        const levelData = gameLevels[currentLevel];
+        const userAnswer = answerInput.value.trim().toLowerCase();
+        
+        // 檢查使用者答案是否在正確答案陣列中
+        const isCorrect = levelData.answer.some(correctAnswer => userAnswer === correctAnswer.trim().toLowerCase());
+
+        if (isCorrect) {
+            showMessage('success', '恭喜你！答案正確！');
+            setTimeout(() => {
+                currentLevel++;
+                // 更新網址以反映關卡進度
+                const newUrl = window.location.pathname + `?level=${currentLevel}`;
+                window.history.pushState({ path: newUrl }, '', newUrl);
+                renderLevel(currentLevel);
+            }, 1000);
+        } else {
+            showMessage('error', '喔不！答案似乎不太對，請再試一次。');
+            container.classList.add('shaking');
+            setTimeout(() => {
+                container.classList.remove('shaking');
+            }, 500);
+        }
+    };
+
+    // 綁定起始按鈕點擊事件
+    startButton.addEventListener('click', () => {
+        const newUrl = window.location.pathname + '?level=1';
+        window.history.pushState({ path: newUrl }, '', newUrl);
+        initGame();
+    });
     
     // 網頁載入時執行遊戲初始化
     window.onload = initGame;
