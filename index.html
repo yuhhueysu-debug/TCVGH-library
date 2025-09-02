@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>醫學偵探大作戰</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #ecf0f1;
+            --card-background: #ffffff;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .container.shaking {
+            animation: shake 0.5s;
+            animation-iteration-count: 1;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            font-size: 2.2em;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.6em;
+            color: var(--primary-color);
+            margin-top: 20px;
+        }
+
+        p {
+            font-size: 1em;
+            line-height: 1.6;
+            text-align: justify;
+            margin-bottom: 15px;
+        }
+
+        #task-description {
+            font-size: 1.1em;
+            font-weight: 400;
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 15px;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        #message-box {
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            transform: scale(0.95);
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        #message-box.show {
+            transform: scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        #message-box.success {
+            background-color: #e8f9ee;
+            color: var(--success-color);
+        }
+
+        #message-box.error {
+            background-color: #fcebeb;
+            color: var(--error-color);
+        }
+
+        .input-group {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        input[type="text"] {
+            width: 95%;
+            padding: 12px;
+            font-size: 1em;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .button-group {
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #completion-page img {
+            width: 100px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container" class="container">
+    
+    <!-- 遊戲首頁 -->
+    <div id="start-page" class="page">
+        <h1>醫學偵探大作戰</h1>
+        <h2>資料庫尋寶之旅</h2>
+        <p>成為圖書館最強的醫學偵探，解鎖隱藏在資料庫中的秘密！</p>
+        <div class="button-group">
+            <button id="startButton">開始遊戲</button>
+        </div>
+        <p>
+            <br/>
+            <strong>遊戲說明：</strong>
+            <br/>
+            1. 前往圖書館內的指定地點，尋找隱藏的 NFC 感應點。<br/>
+            2. 用手機感應 NFC 標籤，即可解鎖任務。<br/>
+            3. 完成任務並輸入正確答案，即可前往下一關。<br/>
+            4. 完成所有關卡，回到服務台領取專屬獎勵！
+        </p>
+    </div>
+
+    <!-- 遊戲關卡頁面 -->
+    <div id="task-page" class="page hidden">
+        <h1 id="level-title"></h1>
+        <div id="task-description"></div>
+        <div id="message-box"></div>
+        <div class="input-group">
+            <input type="text" id="answer-input" placeholder="請輸入你的答案..." />
+        </div>
+        <div class="button-group">
+            <button id="submitButton">提交答案</button>
+        </div>
+    </div>
+
+    <!-- 遊戲結束頁面 -->
+    <div id="completion-page" class="page hidden">
+        <h1>任務完成！</h1>
+        <p>
+            <img src="https://placehold.co/100x100/3498db/ffffff?text=%E2%98%85" alt="完成圖標">
+        </p>
+        <h2>你已成為醫學資料庫大師！</h2>
+        <p>恭喜你！你已經掌握了圖書館最重要的醫學資料庫。現在，帶著你的手機回到圖書館服務台，向館員展示此頁面，即可領取你的榮譽獎勵！</p>
+    </div>
+
+</div>
+
+<script>
+    // 遊戲數據：儲存每個關卡的資訊
+    // 答案建議使用英文字串陣列，避免中文編碼或全形半形問題
+    // 答案會與資料庫中找到的關鍵字相符
+    const gameLevels = {
+        '1': {
+            title: '第一關：PubMed 醫學文獻尋寶',
+            description: '歡迎來到所有醫學文獻的起點！你的任務是運用 PubMed，找出有關「AI 於糖尿病診斷應用」的一篇綜述文章 (Review Article)。請輸入該文章的完整標題。',
+            answer: ['Artificial Intelligence in Diabetes Diagnosis and Management', 'AI in Diabetes Diagnosis and Management: A Review']
+        },
+        '2': {
+            title: '第二關：UpToDate 臨床決策指南',
+            description: '一位病人出現心房顫動 (atrial fibrillation)，想了解最新的治療指引。請在 UpToDate 找到相關內容，並告訴我該文獻建議的「第一線」用藥是什麼？請輸入藥物名稱。',
+            answer: ['rivaroxaban', 'apixaban', 'dabigatran', 'edoxaban']
+        },
+        '3': {
+            title: '第三關：Cochrane Library 實證醫學文獻',
+            description: '想找到「針灸對慢性背痛的療效」的系統性文獻回顧 (systematic review)。請在 Cochrane Library 找到相關文獻，並輸入文獻名稱。',
+            answer: ['Acupuncture for Chronic Low Back Pain', 'Acupuncture for low back pain']
+        },
+        '4': {
+            title: '終極關卡：綜合應用',
+            description: '恭喜你抵達最終關卡！這關沒有謎題，但代表你已經完成所有挑戰。現在請到櫃台領取你的獎勵！',
+            answer: []
+        }
+    };
+
+    // 取得 HTML 元素
+    const startPage = document.getElementById('start-page');
+    const taskPage = document.getElementById('task-page');
+    const completionPage = document.getElementById('completion-page');
+    const startButton = document.getElementById('startButton');
+    const submitButton = document.getElementById('submitButton');
+    const levelTitle = document.getElementById('level-title');
+    const taskDescription = document.getElementById('task-description');
+    const answerInput = document.getElementById('answer-input');
+    const messageBox = document.getElementById('message-box');
+    const container = document.getElementById('game-container');
+
+    let currentLevel = 0;
+
+    // 處理頁面顯示邏輯
+    function showPage(pageId) {
+        // 隱藏所有頁面
+        startPage.classList.add('hidden');
+        taskPage.classList.add('hidden');
+        completionPage.classList.add('hidden');
+
+        // 顯示目標頁面
+        document.getElementById(pageId).classList.remove('hidden');
+    }
+
+    // 顯示訊息框
+    function showMessage(type, message) {
+        messageBox.className = '';
+        messageBox.classList.add('show', type);
+        messageBox.innerText = message;
+    }
+
+    // 渲染遊戲關卡
+    function renderLevel(level) {
+        const levelData = gameLevels[level];
+        if (!levelData) {
+            // 如果 level 不存在，回到起始頁
+            showPage('start-page');
+            return;
+        }
+
+        if (level === 4) {
+            // 如果是終極關卡，直接顯示完成頁
+            showPage('completion-page');
+            return;
+        }
+        
+        showPage('task-page');
+        levelTitle.innerText = levelData.title;
+        taskDescription.innerHTML = `<strong>任務描述：</strong><p>${levelData.description}</p>`;
+        answerInput.value = '';
+        messageBox.classList.remove('show');
+    }
+
+    // 處理遊戲邏輯
+    function initGame() {
+        // 綁定提交按鈕點擊事件
+        submitButton.onclick = () => {
+            const levelData = gameLevels[currentLevel];
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            
+            // 檢查使用者答案是否在正確答案陣列中
+            const isCorrect = levelData.answer.some(correctAnswer => userAnswer === correctAnswer.trim().toLowerCase());
+
+            if (isCorrect) {
+                showMessage('success', '恭喜你！答案正確！');
+                setTimeout(() => {
+                    currentLevel++;
+                    renderLevel(currentLevel);
+                }, 1000);
+            } else {
+                showMessage('error', '喔不！答案似乎不太對，請再試一次。');
+                container.classList.add('shaking');
+                setTimeout(() => {
+                    container.classList.remove('shaking');
+                }, 500);
+            }
+        };
+
+        // 綁定起始按鈕點擊事件
+        startButton.addEventListener('click', () => {
+            currentLevel = 1;
+            renderLevel(currentLevel);
+        });
+
+        // 遊戲初始化時，顯示起始頁
+        showPage('start-page');
+    }
+    
+    // 網頁載入時執行遊戲初始化
+    window.onload = initGame;
+</script>
+
+</body>
+</html>
