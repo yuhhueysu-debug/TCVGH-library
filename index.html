@@ -565,8 +565,7 @@
             document.body.removeChild(tempInput);
 
             copyMessage.innerText = '已成功複製！';
-            luckyMessage.classList.remove('hidden');
-            formButtonContainer.classList.remove('hidden'); // 複製成功後才顯示表單按鈕
+            formButtonContainer.classList.remove('hidden'); // 複製成功後顯示表單按鈕
             setTimeout(() => {
                 copyMessage.innerText = '';
             }, 2000);
