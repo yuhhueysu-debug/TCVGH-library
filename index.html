@@ -297,13 +297,17 @@
         <h2>你已經是醫學資料庫大師了！</h2>
         <p id="completion-message">
             哇！你真的太厲害了！恭喜你，成功破解所有謎題，成為名副其實的醫學偵探！
-            你的資料已記錄完成，<span id="copy-instruction">請先按下方按鈕取得您的抽獎憑證。</span>
+            你的資料已記錄完成，請完成以下動作
+            <br/><br/>
+            1. 按下方按鈕取得您的抽獎憑證
+            <br/>
+            2. 填寫抽獎表單以參加抽獎
         </p>
         <p style="font-family: 'Noto Sans TC', sans-serif;">
             完成時間：<span id="completion-time"></span>
         </p>
         <div class="button-group">
-            <button id="copyButton" style="background-color: #3498db;">複製我的抽獎證明</button>
+            <button id="copyButton" style="background-color: #3498db;">取得抽獎憑證</button>
         </div>
         <div id="copy-message" style="margin-top: 15px; font-weight: bold; color: var(--success-color);"></div>
         <div id="form-button-container" class="button-group hidden">
@@ -332,19 +336,12 @@
             type: 'input',
             answer: ['Artificial Intelligence in Diabetes Diagnosis and Management', 'AI in Diabetes Diagnosis and Management: A Review', 'test']
         },
-        '3': {
-            title: '第三關：Cochrane Library 實證醫學文獻',
-            description: '想找到「針灸對慢性背痛的療效」的系統性文獻回顧 (systematic review)。請在 Cochrane Library 找到相關文獻，並輸入文獻名稱。',
-            type: 'input',
-            answer: ['Acupuncture for Chronic Low Back Pain', 'Acupuncture for low back pain', 'test']
-        },
     };
     
     // 定義所有關卡的代碼，不分順序
     const gameCodes = {
         'code_1': '1',
         'code_2': '2',
-        'code_3': '3',
     };
 
     const vpnPage = document.getElementById('vpn-page');
@@ -600,3 +597,4 @@
 
 </body>
 </html>
+
