@@ -217,18 +217,35 @@
 
 <div id="game-container" class="container">
     
-    <!-- 遊戲首頁 -->
-    <div id="start-page" class="page">
+    <!-- VPN 說明頁 -->
+    <div id="vpn-page" class="page">
         <h1>醫學偵探大作戰</h1>
         <h2>資料庫尋寶之旅</h2>
         <p>
             嘿！歡迎來到這場特別的醫學探險！
-            在這裡，你將透過一系列超酷的挑戰，成為最強的醫學偵探。
-            準備好來一場刺激的尋寶之旅了嗎？
+            本遊戲部分關卡需連線至本院VPN方可進行，請於開始前完成以下步驟：
+            <br/><br/>
+            1. 手機版請至Google Play 商店或 APPLE STORE 搜尋 **「Ivanti Secure Access Client」**並下載安裝。
+            <br/><br/>
+            2. 設定伺服器URL(s)請填入：**https://sslvpn.vghtc.gov.tw/e-learning**
+            <br/><br/>
+            3. VPN連線驗證帳密為「**院內信箱帳號&信箱密碼**」，只需輸入帳號即可，不需要後面的 domain。
+            <br/><br/>
+            4. 各職類實習學生帳密，請洽職類教師，或教學部(分機4354)。
         </p>
         <div class="button-group">
-            <button id="startButton">Let's go!</button>
+            <button id="vpnDoneButton">我已完成設定！</button>
         </div>
+    </div>
+
+    <!-- 遊戲主頁 -->
+    <div id="start-page" class="page hidden">
+        <h1>醫學偵探大作戰</h1>
+        <h2>資料庫尋寶之旅</h2>
+        <p>
+            準備好來一場刺激的尋寶之旅了嗎？
+        </p>
+        
         <p>
             <br/>
             <strong>遊戲指南：</strong>
@@ -238,7 +255,24 @@
             3. 輸入正確答案，就能進入下一關。<br/>
             4. 完成所有關卡，回到服務台，就有專屬的驚喜獎勵等著你！
         </p>
+        <div class="button-group">
+            <button id="startButton">Let's go!</button>
+        </div>
     </div>
+    
+    <!-- 使用者資訊輸入頁面 -->
+    <div id="user-info-page" class="page hidden">
+        <h2>輸入玩家資訊</h2>
+        <p>請輸入您的卡號或身份證號碼，作為參與遊戲和抽獎的憑證。</p>
+        <div class="input-group">
+            <input type="text" id="user-id-input" placeholder="請輸入您的卡號或身份證號碼" />
+        </div>
+        <div class="button-group">
+            <button id="userInfoSubmitButton">開始遊戲</button>
+        </div>
+        <div id="user-info-message" class="message-box"></div>
+    </div>
+
 
     <!-- 遊戲關卡頁面 -->
     <div id="task-page" class="page hidden">
@@ -261,16 +295,25 @@
     <div id="completion-page" class="page hidden">
         <h1>任務完成！</h1>
         <h2>你已經是醫學資料庫大師了！</h2>
-        <p>
+        <p id="completion-message">
             哇！你真的太厲害了！恭喜你，成功破解所有謎題，成為名副其實的醫學偵探！
-            現在，快到圖書館服務台找我們的館員，展示這個頁面，他們會給你一個超棒的榮譽獎勵喔！
+            你的資料已記錄完成，請點選下方按鈕取得抽獎憑證。
         </p>
+        <p style="font-family: 'Noto Sans TC', sans-serif;">
+            完成時間：<span id="completion-time"></span>
+        </p>
+        <div class="button-group">
+            <button id="copyButton" style="background-color: #3498db;">複製我的抽獎證明</button>
+            <button id="formButton" style="background-color: #27ae60;">前往抽獎表單</button>
+        </div>
+        <div id="copy-message" style="margin-top: 15px; font-weight: bold; color: var(--success-color);"></div>
     </div>
 
 </div>
 
 <script>
-    const localStorageKey = 'completedLevels';
+    const localStorageKeyCompleted = 'completedLevels';
+    const localStorageKeyUserInfo = 'userInfo';
 
     const gameLevels = {
         '1': {
@@ -301,33 +344,45 @@
         'code_3': '3',
     };
 
+    const vpnPage = document.getElementById('vpn-page');
     const startPage = document.getElementById('start-page');
+    const userInfoPage = document.getElementById('user-info-page');
     const taskPage = document.getElementById('task-page');
     const completionPage = document.getElementById('completion-page');
+    const vpnDoneButton = document.getElementById('vpnDoneButton');
     const startButton = document.getElementById('startButton');
+    const userInfoSubmitButton = document.getElementById('userInfoSubmitButton');
     const submitButton = document.getElementById('submitButton');
+    const copyButton = document.getElementById('copyButton');
+    const formButton = document.getElementById('formButton');
     const levelTitle = document.getElementById('level-title');
     const taskDescription = document.getElementById('task-description');
     const answerInput = document.getElementById('answer-input');
     const messageBox = document.getElementById('message-box');
+    const userInfoMessageBox = document.getElementById('user-info-message');
     const container = document.getElementById('game-container');
     const inputGroup = document.getElementById('input-group');
     const choiceGroup = document.getElementById('choice-group');
+    const userIdInput = document.getElementById('user-id-input');
+    const copyMessage = document.getElementById('copy-message');
+    const completionTimeSpan = document.getElementById('completion-time');
 
     let currentLevel = null;
     let selectedChoice = null;
 
     function showPage(pageId) {
+        vpnPage.classList.add('hidden');
         startPage.classList.add('hidden');
+        userInfoPage.classList.add('hidden');
         taskPage.classList.add('hidden');
         completionPage.classList.add('hidden');
         document.getElementById(pageId).classList.remove('hidden');
     }
 
-    function showMessage(type, message) {
-        messageBox.className = '';
-        messageBox.classList.add('show', type);
-        messageBox.innerText = message;
+    function showMessage(element, type, message) {
+        element.className = '';
+        element.classList.add('show', type);
+        element.innerText = message;
     }
 
     function renderLevel(level) {
@@ -369,12 +424,21 @@
     }
 
     function getCompletedLevels() {
-        const savedData = localStorage.getItem(localStorageKey);
+        const savedData = localStorage.getItem(localStorageKeyCompleted);
         return savedData ? JSON.parse(savedData) : [];
+    }
+    
+    function getUserInfo() {
+        const userInfo = localStorage.getItem(localStorageKeyUserInfo);
+        return userInfo ? JSON.parse(userInfo) : null;
     }
 
     function saveCompletedLevels(levels) {
-        localStorage.setItem(localStorageKey, JSON.stringify(levels));
+        localStorage.setItem(localStorageKeyCompleted, JSON.stringify(levels));
+    }
+
+    function saveUserInfo(info) {
+        localStorage.setItem(localStorageKeyUserInfo, JSON.stringify(info));
     }
 
     function isAllLevelsCompleted() {
@@ -396,10 +460,6 @@
         return null;
     }
 
-    function initGame() {
-        // ... (不變)
-    }
-
     submitButton.onclick = () => {
         const levelData = gameLevels[currentLevel];
         let isCorrect = false;
@@ -418,21 +478,33 @@
                 saveCompletedLevels(completedLevels);
             }
 
-            showMessage('success', '恭喜你！答案正確！');
+            showMessage(messageBox, 'success', '恭喜你！答案正確！');
             setTimeout(() => {
                 if (isAllLevelsCompleted()) {
                     showPage('completion-page');
-                    localStorage.removeItem(localStorageKey);
+                    
+                    // 將使用者資料與完成狀態和時間儲存，以供抽獎
+                    const userInfo = getUserInfo();
+                    if (userInfo) {
+                       saveUserInfo({
+                           id: userInfo.id,
+                           completed: true,
+                           completedDate: new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })
+                       });
+                    }
+                    const updatedUserInfo = getUserInfo();
+                    if (updatedUserInfo && updatedUserInfo.completedDate) {
+                        completionTimeSpan.innerText = updatedUserInfo.completedDate;
+                    }
+
                 } else {
                     // 自動跳到下一個未完成的關卡
                     currentLevel = getNextLevel();
                     renderLevel(currentLevel);
                 }
-                const newUrl = window.location.pathname;
-                window.history.pushState({ path: newUrl }, '', newUrl);
             }, 1000);
         } else {
-            showMessage('error', '喔不！答案似乎不太對，請再試一次。');
+            showMessage(messageBox, 'error', '喔不！答案似乎不太對，請再試一次。');
             container.classList.add('shaking');
             setTimeout(() => {
                 container.classList.remove('shaking');
@@ -440,16 +512,83 @@
         }
     };
 
+    vpnDoneButton.addEventListener('click', () => {
+        showPage('start-page');
+    });
+
     startButton.addEventListener('click', () => {
-        // 當使用者在沒有URL參數的情況下點擊「開始遊戲」
-        // 直接載入第一個未完成的關卡
-        currentLevel = getNextLevel();
-        renderLevel(currentLevel);
+        // 點擊開始遊戲按鈕，顯示使用者資訊輸入頁面
+        showPage('user-info-page');
     });
     
-    // 移除 initGame 邏輯，直接從首頁開始
+    userInfoSubmitButton.addEventListener('click', () => {
+        const userId = userIdInput.value.trim();
+        if (userId === '') {
+            showMessage(userInfoMessageBox, 'error', '卡號或身份證號碼不能為空，請輸入。');
+            container.classList.add('shaking');
+            setTimeout(() => {
+                container.classList.remove('shaking');
+            }, 500);
+            return;
+        }
+        
+        // 儲存使用者資訊
+        saveUserInfo({
+            id: userId,
+            completed: false // 尚未完成所有關卡
+        });
+
+        // 檢查是否所有關卡已完成
+        if (isAllLevelsCompleted()) {
+             showPage('completion-page');
+        } else {
+            // 直接載入第一個未完成的關卡
+            currentLevel = getNextLevel();
+            renderLevel(currentLevel);
+        }
+    });
+    
+    copyButton.addEventListener('click', () => {
+        const userInfo = getUserInfo();
+        if (userInfo && userInfo.completed) {
+            const copyText = `闖關完成證明\n完成時間: ${userInfo.completedDate}\n玩家代碼: ${userInfo.id}`;
+            const tempInput = document.createElement('textarea');
+            tempInput.value = copyText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            copyMessage.innerText = '已成功複製！';
+            setTimeout(() => {
+                copyMessage.innerText = '';
+            }, 2000);
+        } else {
+            copyMessage.innerText = '請先完成所有關卡！';
+        }
+    });
+
+    formButton.addEventListener('click', () => {
+        window.open('https://docs.google.com/forms/d/e/1FAIpQLSfypsblR_Wy_6-W5lK-SH8FWkuKw29qxuX-z1srrijOQgq-ug/viewform?usp=sharing&ouid=116746129946527964158', '_blank');
+    });
+
     window.onload = () => {
-        showPage('start-page');
+        // 在網頁載入時檢查是否已經輸入過資訊
+        const userInfo = getUserInfo();
+        if (userInfo && userInfo.completed) {
+            // 如果已完成所有關卡，直接顯示完成頁
+            showPage('completion-page');
+            if (userInfo.completedDate) {
+                completionTimeSpan.innerText = userInfo.completedDate;
+            }
+        } else if (userInfo) {
+            // 如果有資訊但未完成，直接進入遊戲
+            currentLevel = getNextLevel();
+            renderLevel(currentLevel);
+        } else {
+            // 否則顯示VPN頁
+            showPage('vpn-page');
+        }
     };
 </script>
 
