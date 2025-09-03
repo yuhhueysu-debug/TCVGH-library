@@ -443,8 +443,10 @@
     };
 
     startButton.addEventListener('click', () => {
-        showPage('start-page');
-        showMessage('error', '請親自前往 NFC 標籤位置，掃描後即可開始遊戲。');
+        // 當使用者在沒有URL參數的情況下點擊「開始遊戲」
+        // 直接載入第一關
+        currentLevel = '1';
+        renderLevel(currentLevel);
     });
     
     window.onload = initGame;
