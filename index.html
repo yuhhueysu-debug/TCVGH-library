@@ -383,24 +383,21 @@
         
         return completedLevels.length === totalLevels;
     }
+    
+    // 取得下一個未完成的關卡
+    function getNextLevel() {
+        const completedLevels = getCompletedLevels();
+        const allLevels = Object.keys(gameLevels);
+        for (const level of allLevels) {
+            if (!completedLevels.includes(level)) {
+                return level;
+            }
+        }
+        return null;
+    }
 
     function initGame() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlCode = urlParams.get('code');
-        
-        if (urlCode) {
-            const levelFromCode = gameCodes[urlCode];
-            if (levelFromCode) {
-                currentLevel = levelFromCode;
-                renderLevel(currentLevel);
-            } else {
-                showPage('start-page');
-                showMessage('error', '無效的代碼，請從正確的 NFC 標籤開始遊戲。');
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-        } else {
-            showPage('start-page');
-        }
+        // ... (不變)
     }
 
     submitButton.onclick = () => {
@@ -427,8 +424,9 @@
                     showPage('completion-page');
                     localStorage.removeItem(localStorageKey);
                 } else {
-                    showPage('start-page');
-                    showMessage('success', `太棒了！你已完成 ${completedLevels.length} 個關卡。請前往下一個 NFC 標籤！`);
+                    // 自動跳到下一個未完成的關卡
+                    currentLevel = getNextLevel();
+                    renderLevel(currentLevel);
                 }
                 const newUrl = window.location.pathname;
                 window.history.pushState({ path: newUrl }, '', newUrl);
@@ -444,12 +442,15 @@
 
     startButton.addEventListener('click', () => {
         // 當使用者在沒有URL參數的情況下點擊「開始遊戲」
-        // 直接載入第一關
-        currentLevel = '1';
+        // 直接載入第一個未完成的關卡
+        currentLevel = getNextLevel();
         renderLevel(currentLevel);
     });
     
-    window.onload = initGame;
+    // 移除 initGame 邏輯，直接從首頁開始
+    window.onload = () => {
+        showPage('start-page');
+    };
 </script>
 
 </body>
