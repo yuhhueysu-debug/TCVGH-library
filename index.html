@@ -297,16 +297,19 @@
         <h2>你已經是醫學資料庫大師了！</h2>
         <p id="completion-message">
             哇！你真的太厲害了！恭喜你，成功破解所有謎題，成為名副其實的醫學偵探！
-            你的資料已記錄完成，請點選下方按鈕取得抽獎憑證。
+            你的資料已記錄完成，<span id="copy-instruction">請先按下方按鈕取得您的抽獎憑證。</span>
         </p>
         <p style="font-family: 'Noto Sans TC', sans-serif;">
             完成時間：<span id="completion-time"></span>
         </p>
         <div class="button-group">
             <button id="copyButton" style="background-color: #3498db;">複製我的抽獎證明</button>
-            <button id="formButton" style="background-color: #27ae60;">前往抽獎表單</button>
         </div>
         <div id="copy-message" style="margin-top: 15px; font-weight: bold; color: var(--success-color);"></div>
+        <div id="form-button-container" class="button-group hidden">
+            <p style="text-align: center; font-size: 1.1em; color: var(--primary-color);">請填寫抽獎表單參加抽獎，祝您好運！</p>
+            <button id="formButton" style="background-color: #27ae60;">填寫抽獎表單</button>
+        </div>
     </div>
 
 </div>
@@ -355,6 +358,7 @@
     const submitButton = document.getElementById('submitButton');
     const copyButton = document.getElementById('copyButton');
     const formButton = document.getElementById('formButton');
+    const formButtonContainer = document.getElementById('form-button-container');
     const levelTitle = document.getElementById('level-title');
     const taskDescription = document.getElementById('task-description');
     const answerInput = document.getElementById('answer-input');
@@ -366,6 +370,7 @@
     const userIdInput = document.getElementById('user-id-input');
     const copyMessage = document.getElementById('copy-message');
     const completionTimeSpan = document.getElementById('completion-time');
+    const luckyMessage = document.getElementById('lucky-message');
 
     let currentLevel = null;
     let selectedChoice = null;
@@ -560,6 +565,8 @@
             document.body.removeChild(tempInput);
 
             copyMessage.innerText = '已成功複製！';
+            luckyMessage.classList.remove('hidden');
+            formButtonContainer.classList.remove('hidden'); // 複製成功後才顯示表單按鈕
             setTimeout(() => {
                 copyMessage.innerText = '';
             }, 2000);
