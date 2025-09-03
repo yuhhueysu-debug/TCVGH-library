@@ -4,19 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>醫學偵探大作戰</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --background-color: #ecf0f1;
+            --primary-color: #3b5998;
+            --secondary-color: #83c5be;
+            --background-color: #f7f9fc;
             --card-background: #ffffff;
-            --success-color: #27ae60;
+            --success-color: #2ecc71;
             --error-color: #e74c3c;
+            --button-shadow: #7f8c8d;
         }
 
         body {
-            font-family: 'Noto Sans TC', sans-serif;
+            font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
             background-color: var(--background-color);
             color: var(--primary-color);
             display: flex;
@@ -33,11 +34,12 @@
             width: 100%;
             max-width: 600px;
             background-color: var(--card-background);
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
             text-align: center;
             transition: transform 0.3s ease-in-out;
+            border: 2px solid var(--secondary-color);
         }
 
         .container.shaking {
@@ -60,39 +62,46 @@
         }
 
         h1 {
-            color: var(--secondary-color);
-            font-size: 2.2em;
-            margin-bottom: 5px;
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-bottom: 10px;
             font-weight: 700;
         }
 
         h2 {
-            font-size: 1.6em;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 1.8em;
             color: var(--primary-color);
-            margin-top: 20px;
+            margin-top: 10px;
+        }
+        
+        #start-page h1 {
+            color: var(--secondary-color);
+            text-shadow: 2px 2px 0px #f0f0f0;
         }
 
         p {
-            font-size: 1em;
-            line-height: 1.6;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 1.1em;
+            line-height: 1.8;
             text-align: justify;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         #task-description {
-            font-size: 1.1em;
+            font-size: 1.2em;
             font-weight: 400;
-            border-left: 4px solid var(--secondary-color);
+            border-left: 5px solid var(--secondary-color);
             padding-left: 15px;
-            margin: 25px 0;
+            margin: 30px 0;
             text-align: left;
         }
 
         #message-box {
             font-weight: bold;
             padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
             text-align: center;
             transition: all 0.3s ease;
             transform: scale(0.95);
@@ -104,6 +113,13 @@
             transform: scale(1);
             opacity: 1;
             visibility: visible;
+            animation: bounceIn 0.5s;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
         }
         
         #message-box.success {
@@ -118,45 +134,72 @@
 
         .input-group {
             width: 100%;
-            margin-top: 20px;
+            margin-top: 25px;
         }
 
         input[type="text"] {
             width: 95%;
-            padding: 12px;
-            font-size: 1em;
+            padding: 15px;
+            font-size: 1.1em;
             border: 2px solid #bdc3c7;
-            border-radius: 8px;
-            transition: border-color 0.3s;
+            border-radius: 12px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background-color: #f9f9f9;
         }
 
         input[type="text"]:focus {
             outline: none;
             border-color: var(--secondary-color);
+            box-shadow: 0 0 8px rgba(131, 197, 190, 0.5);
         }
 
         .button-group {
-            margin-top: 20px;
+            margin-top: 30px;
         }
 
         button {
             background-color: var(--secondary-color);
             color: white;
-            padding: 12px 25px;
+            padding: 15px 30px;
             border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
+            border-radius: 15px;
+            font-size: 1.2em;
             font-weight: 700;
             cursor: pointer;
             transition: background-color 0.3s, transform 0.1s;
+            box-shadow: 0 4px 0px var(--button-shadow);
+        }
+        
+        button.choice-button {
+            background-color: #e0f2f1;
+            color: var(--primary-color);
+            padding: 15px;
+            margin: 5px 0;
+            width: 100%;
+            text-align: left;
+        }
+
+        button.choice-button.selected {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        button.choice-button:hover {
+            background-color: #c4e4e1;
+        }
+
+        button.choice-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0px var(--button-shadow);
         }
 
         button:hover {
-            background-color: #2980b9;
+            background-color: #72a8a1;
         }
 
         button:active {
-            transform: scale(0.98);
+            transform: translateY(2px);
+            box-shadow: 0 2px 0px var(--button-shadow);
         }
 
         .hidden {
@@ -164,7 +207,7 @@
         }
 
         #completion-page img, #start-page img {
-            width: 100px;
+            width: 120px;
             height: auto;
             margin-bottom: 20px;
         }
@@ -179,20 +222,21 @@
         <h1>醫學偵探大作戰</h1>
         <h2>資料庫尋寶之旅</h2>
         <p>
-            歡迎來到醫學資料庫的尋寶之旅！
-            在這裡，你將透過一系列的挑戰，成為最強的醫學偵探。
+            嘿！歡迎來到這場特別的醫學探險！
+            在這裡，你將透過一系列超酷的挑戰，成為最強的醫學偵探。
+            準備好來一場刺激的尋寶之旅了嗎？
         </p>
         <div class="button-group">
-            <button id="startButton">開始挑戰</button>
+            <button id="startButton">Let's go!</button>
         </div>
         <p>
             <br/>
-            <strong>遊戲說明：</strong>
+            <strong>遊戲指南：</strong>
             <br/>
-            1. 前往圖書館內的指定地點，尋找隱藏的 NFC 感應點。<br/>
-            2. 用手機感應 NFC 標籤，即可解鎖任務。<br/>
-            3. 完成任務並輸入正確答案，即可前往下一關。<br/>
-            4. 完成所有關卡，回到服務台領取專屬獎勵！
+            1. 尋找隱藏在圖書館各個角落的 NFC 感應點。<br/>
+            2. 用你的手機輕輕一碰，就能解鎖任務！<br/>
+            3. 輸入正確答案，就能進入下一關。<br/>
+            4. 完成所有關卡，回到服務台，就有專屬的驚喜獎勵等著你！
         </p>
     </div>
 
@@ -201,8 +245,12 @@
         <h1 id="level-title"></h1>
         <div id="task-description"></div>
         <div id="message-box"></div>
-        <div class="input-group">
-            <input type="text" id="answer-input" placeholder="請輸入你的答案..." />
+        <div id="question-area">
+            <div id="input-group" class="input-group">
+                <input type="text" id="answer-input" placeholder="請輸入你的答案..." />
+            </div>
+            <div id="choice-group" class="input-group hidden">
+            </div>
         </div>
         <div class="button-group">
             <button id="submitButton">提交答案</button>
@@ -212,42 +260,47 @@
     <!-- 遊戲結束頁面 -->
     <div id="completion-page" class="page hidden">
         <h1>任務完成！</h1>
-        <h2>恭喜你，你已成為醫學資料庫大師！</h2>
+        <h2>你已經是醫學資料庫大師了！</h2>
         <p>
-            你已經掌握了圖書館最重要的醫學資料庫。現在，帶著你的手機回到圖書館服務台，向館員展示此頁面，就可以領取你的榮譽獎勵囉！
+            哇！你真的太厲害了！恭喜你，成功破解所有謎題，成為名副其實的醫學偵探！
+            現在，快到圖書館服務台找我們的館員，展示這個頁面，他們會給你一個超棒的榮譽獎勵喔！
         </p>
     </div>
 
 </div>
 
 <script>
-    // 遊戲數據：儲存每個關卡的資訊
-    // 答案建議使用英文字串陣列，避免中文編碼或全形半形問題
-    // 答案會與資料庫中找到的關鍵字相符
+    const localStorageKey = 'completedLevels';
+
     const gameLevels = {
         '1': {
-            title: '第一關：PubMed 醫學文獻尋寶',
-            description: '歡迎來到所有醫學文獻的起點！你的任務是運用 PubMed，找出有關「AI 於糖尿病診斷應用」的一篇綜述文章 (Review Article)。請輸入該文章的完整標題。',
-            answer: ['Artificial Intelligence in Diabetes Diagnosis and Management', 'AI in Diabetes Diagnosis and Management: A Review', 'test']
+            title: '第一關：圖書館尋寶',
+            description: '歡迎來到我們的圖書館！請問，本館主要位於台中榮總的哪一棟大樓？',
+            type: 'choice',
+            options: ['急診大樓七樓', '教學大樓', '研究大樓'],
+            answer: 0
         },
         '2': {
-            title: '第二關：UpToDate 臨床決策指南',
-            description: '一位病人出現心房顫動 (atrial fibrillation)，想了解最新的治療指引。請在 UpToDate 找到相關內容，並告訴我該文獻建議的「第一線」用藥是什麼？請輸入藥物名稱。',
-            answer: ['rivaroxaban', 'apixaban', 'dabigatran', 'edoxaban', 'test']
+            title: '第二關：PubMed 醫學文獻尋寶',
+            description: '歡迎來到所有醫學文獻的起點！你的任務是運用 PubMed，找出有關「AI 於糖尿病診斷應用」的一篇綜述文章 (Review Article)。請輸入該文章的完整標題。',
+            type: 'input',
+            answer: ['Artificial Intelligence in Diabetes Diagnosis and Management', 'AI in Diabetes Diagnosis and Management: A Review', 'test']
         },
         '3': {
             title: '第三關：Cochrane Library 實證醫學文獻',
             description: '想找到「針灸對慢性背痛的療效」的系統性文獻回顧 (systematic review)。請在 Cochrane Library 找到相關文獻，並輸入文獻名稱。',
+            type: 'input',
             answer: ['Acupuncture for Chronic Low Back Pain', 'Acupuncture for low back pain', 'test']
         },
-        '4': {
-            title: '終極關卡：綜合應用',
-            description: '恭喜你抵達最終關卡！這關沒有謎題，但代表你已經完成所有挑戰。現在請到櫃台領取你的獎勵！',
-            answer: ['test']
-        }
+    };
+    
+    // 定義所有關卡的代碼，不分順序
+    const gameCodes = {
+        'code_1': '1',
+        'code_2': '2',
+        'code_3': '3',
     };
 
-    // 取得 HTML 元素
     const startPage = document.getElementById('start-page');
     const taskPage = document.getElementById('task-page');
     const completionPage = document.getElementById('completion-page');
@@ -258,78 +311,127 @@
     const answerInput = document.getElementById('answer-input');
     const messageBox = document.getElementById('message-box');
     const container = document.getElementById('game-container');
+    const inputGroup = document.getElementById('input-group');
+    const choiceGroup = document.getElementById('choice-group');
 
-    let currentLevel = 0;
+    let currentLevel = null;
+    let selectedChoice = null;
 
-    // 處理頁面顯示邏輯
     function showPage(pageId) {
-        // 隱藏所有頁面
         startPage.classList.add('hidden');
         taskPage.classList.add('hidden');
         completionPage.classList.add('hidden');
-
-        // 顯示目標頁面
         document.getElementById(pageId).classList.remove('hidden');
     }
 
-    // 顯示訊息框
     function showMessage(type, message) {
         messageBox.className = '';
         messageBox.classList.add('show', type);
         messageBox.innerText = message;
     }
 
-    // 渲染遊戲關卡
     function renderLevel(level) {
         const levelData = gameLevels[level];
         if (!levelData) {
-            // 如果 level 不存在，回到起始頁
             showPage('start-page');
             return;
         }
 
-        if (level === 4) {
-            // 如果是終極關卡，直接顯示完成頁
-            showPage('completion-page');
-            return;
-        }
-        
         showPage('task-page');
         levelTitle.innerText = levelData.title;
         taskDescription.innerHTML = `<strong>任務描述：</strong><p>${levelData.description}</p>`;
-        answerInput.value = '';
         messageBox.classList.remove('show');
+        
+        // 根據題目類型顯示不同介面
+        if (levelData.type === 'input') {
+            inputGroup.classList.remove('hidden');
+            choiceGroup.classList.add('hidden');
+            answerInput.value = '';
+        } else if (levelData.type === 'choice') {
+            inputGroup.classList.add('hidden');
+            choiceGroup.classList.remove('hidden');
+            choiceGroup.innerHTML = ''; // 清空舊選項
+            levelData.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.classList.add('choice-button');
+                button.innerText = option;
+                button.onclick = () => {
+                    selectedChoice = index;
+                    // 移除所有按鈕的 selected 樣式
+                    Array.from(choiceGroup.children).forEach(btn => btn.classList.remove('selected'));
+                    // 為點擊的按鈕添加 selected 樣式
+                    button.classList.add('selected');
+                };
+                choiceGroup.appendChild(button);
+            });
+            selectedChoice = null;
+        }
     }
 
-    // 處理遊戲邏輯
+    function getCompletedLevels() {
+        const savedData = localStorage.getItem(localStorageKey);
+        return savedData ? JSON.parse(savedData) : [];
+    }
+
+    function saveCompletedLevels(levels) {
+        localStorage.setItem(localStorageKey, JSON.stringify(levels));
+    }
+
+    function isAllLevelsCompleted() {
+        const completedLevels = getCompletedLevels();
+        const totalLevels = Object.keys(gameLevels).length;
+        
+        return completedLevels.length === totalLevels;
+    }
+
     function initGame() {
         const urlParams = new URLSearchParams(window.location.search);
-        const urlLevel = urlParams.get('level');
-        if (urlLevel && gameLevels[urlLevel]) {
-            currentLevel = parseInt(urlLevel);
-            renderLevel(currentLevel);
+        const urlCode = urlParams.get('code');
+        
+        if (urlCode) {
+            const levelFromCode = gameCodes[urlCode];
+            if (levelFromCode) {
+                currentLevel = levelFromCode;
+                renderLevel(currentLevel);
+            } else {
+                showPage('start-page');
+                showMessage('error', '無效的代碼，請從正確的 NFC 標籤開始遊戲。');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
         } else {
-            // 如果沒有 level 參數，或 level 不存在，顯示起始頁
             showPage('start-page');
         }
     }
 
-    // 綁定提交按鈕點擊事件
     submitButton.onclick = () => {
         const levelData = gameLevels[currentLevel];
-        const userAnswer = answerInput.value.trim().toLowerCase();
-        
-        // 檢查使用者答案是否在正確答案陣列中
-        const isCorrect = levelData.answer.some(correctAnswer => userAnswer === correctAnswer.trim().toLowerCase());
+        let isCorrect = false;
+
+        if (levelData.type === 'input') {
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            isCorrect = levelData.answer.some(correctAnswer => userAnswer === correctAnswer.trim().toLowerCase());
+        } else if (levelData.type === 'choice') {
+            isCorrect = (selectedChoice === levelData.answer);
+        }
 
         if (isCorrect) {
+            let completedLevels = getCompletedLevels();
+            if (!completedLevels.includes(currentLevel)) {
+                completedLevels.push(currentLevel);
+                saveCompletedLevels(completedLevels);
+            }
+
             showMessage('success', '恭喜你！答案正確！');
             setTimeout(() => {
-                currentLevel++;
-                // 更新網址以反映關卡進度
-                const newUrl = window.location.pathname + `?level=${currentLevel}`;
+                if (isAllLevelsCompleted()) {
+                    showPage('completion-page');
+                    localStorage.removeItem(localStorageKey);
+                } else {
+                    showPage('start-page');
+                    showMessage('success', `太棒了！你已完成 ${completedLevels.length} 個關卡。請前往下一個 NFC 標籤！`);
+                }
+                const newUrl = window.location.pathname;
                 window.history.pushState({ path: newUrl }, '', newUrl);
-                renderLevel(currentLevel);
             }, 1000);
         } else {
             showMessage('error', '喔不！答案似乎不太對，請再試一次。');
@@ -340,14 +442,11 @@
         }
     };
 
-    // 綁定起始按鈕點擊事件
     startButton.addEventListener('click', () => {
-        const newUrl = window.location.pathname + '?level=1';
-        window.history.pushState({ path: newUrl }, '', newUrl);
-        initGame();
+        showPage('start-page');
+        showMessage('error', '請親自前往 NFC 標籤位置，掃描後即可開始遊戲。');
     });
     
-    // 網頁載入時執行遊戲初始化
     window.onload = initGame;
 </script>
 
