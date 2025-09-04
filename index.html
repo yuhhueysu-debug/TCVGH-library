@@ -572,7 +572,13 @@
     });
 
     formButton.addEventListener('click', () => {
-        window.open('https://docs.google.com/forms/d/e/1FAIpQLSfypsblR_Wy_6-W5lK-SH8FWkuKw29qxuX-z1srrijOQgq-ug/viewform?usp=sharing&ouid=116746129946527964158', '_blank');
+        const userInfo = getUserInfo();
+        const combinedString = `${userInfo.completedDate} ${userInfo.id}`;
+        
+        // Google Form 預填欄位
+        const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSfypsblR_Wy_6-W5lK-SH8FWkuKw29qxuX-z1srrijOQgq-ug/viewform?usp=sharing&entry.1488005670=${encodeURIComponent(combinedString)}`;
+        
+        window.open(formUrl, '_blank');
     });
 
     window.onload = () => {
@@ -597,4 +603,3 @@
 
 </body>
 </html>
-
