@@ -146,6 +146,10 @@
             transition: border-color 0.3s, box-shadow 0.3s;
             background-color: #f9f9f9;
         }
+        
+        #multiple-input-group input[type="text"] {
+            margin-bottom: 10px;
+        }
 
         input[type="text"]:focus {
             outline: none;
@@ -267,10 +271,10 @@
         <div class="input-group">
             <input type="text" id="user-id-input" placeholder="請輸入您的卡號或身份證號碼" />
         </div>
+        <div id="user-info-message" class="message-box"></div>
         <div class="button-group">
             <button id="userInfoSubmitButton">開始遊戲</button>
         </div>
-        <div id="user-info-message" class="message-box"></div>
     </div>
 
 
@@ -284,6 +288,10 @@
                 <input type="text" id="answer-input" placeholder="請輸入你的答案..." />
             </div>
             <div id="choice-group" class="input-group hidden">
+            </div>
+            <div id="multiple-input-group" class="input-group hidden">
+                <input type="text" id="answer-input-1" placeholder="請輸入IF..." />
+                <input type="text" id="answer-input-2" placeholder="請輸入Q等級..." />
             </div>
         </div>
         <div class="button-group">
@@ -332,16 +340,32 @@
         },
         '2': {
             title: '第二關：PubMed 醫學文獻尋寶',
-            description: '歡迎來到所有醫學文獻的起點！你的任務是運用 PubMed，找出有關「AI 於糖尿病診斷應用」的一篇綜述文章 (Review Article)。請輸入該文章的完整標題。',
+            description: '歡迎來到所有醫學文獻的起點！你的任務是運用 PubMed，找出有關人工智慧(AI)介入對血糖控制(glycemic control)的有效性的一篇Meta Analysis文章，這篇文章於2025年8月刊登於Primary Care Diabetes這本期刊。請輸入該文章的DOI。',
             type: 'input',
-            answer: ['Artificial Intelligence in Diabetes Diagnosis and Management', 'AI in Diabetes Diagnosis and Management: A Review', 'test']
+            answer: ['10.1016/j.pcd.2025.05.004', 'doi: 10.1016/j.pcd.2025.05.004', '10.1016/j.pcd.2025.05.004.', 'doi: 10.1016/j.pcd.2025.05.004.']
         },
+        '3': {
+            title: '第三關：InCites JCR 期刊影響力評估',
+            description: '前面查到的 Primary Care Diabetes 這本期刊不知道評價如何，聽說期刊有一個叫作影響指數(Impact Factor)的指標，請你利用Incites JCR 資料庫查查看這本期刊在2024年的IF(Impact Factor)是幾分? 它在PRIMARY HEALTH CARE這個領域，是屬於Ｑ幾的等級呢？',
+            type: 'multiple_input',
+            answers: ['2.3', 'Q2'],
+            answer_placeholder: ['請輸入IF...', '請輸入Q等級...']
+        },
+        '4': {
+            title: '第四關：',
+            description: '關於血糖控制，在Dynamed 中有關於 Insulin Therapy for Adults With Type 2 Diabetes 的資訊, 其中提到American Diabetes Association(ADA)對於HbA1c > 10% (86 mmol/mol) 或血糖值 ≥ 300 mg/dL (16.7mmol/L) 的病人開始施打胰島素進行治療, 其建議等級是',
+            type: 'choice',
+            options: ['ADA A級', 'ADA B級', 'ADA C級', 'ADA D級', 'ADA E級'],
+            answer: 4
+        }
     };
     
     // 定義所有關卡的代碼，不分順序
     const gameCodes = {
         'code_1': '1',
         'code_2': '2',
+        'code_3': '3',
+        'code_4': '4'
     };
 
     const vpnPage = document.getElementById('vpn-page');
@@ -359,11 +383,14 @@
     const levelTitle = document.getElementById('level-title');
     const taskDescription = document.getElementById('task-description');
     const answerInput = document.getElementById('answer-input');
+    const answerInput1 = document.getElementById('answer-input-1');
+    const answerInput2 = document.getElementById('answer-input-2');
     const messageBox = document.getElementById('message-box');
     const userInfoMessageBox = document.getElementById('user-info-message');
     const container = document.getElementById('game-container');
     const inputGroup = document.getElementById('input-group');
     const choiceGroup = document.getElementById('choice-group');
+    const multipleInputGroup = document.getElementById('multiple-input-group');
     const userIdInput = document.getElementById('user-id-input');
     const copyMessage = document.getElementById('copy-message');
     const completionTimeSpan = document.getElementById('completion-time');
@@ -372,6 +399,23 @@
     let currentLevel = null;
     let selectedChoice = null;
 
+    // 將全形數字轉換為半形
+    function toHalfWidth(str) {
+        return str.replace(/[\uff01-\uff5e]/g, (char) => {
+            return String.fromCharCode(char.charCodeAt(0) - 0xfee0);
+        });
+    }
+
+    // 只保留數字
+    function removeNonDigits(str) {
+        return str.replace(/\D/g, '');
+    }
+    
+    // 只保留數字和 '.' '/'
+    function removeNonDOI(str) {
+        return str.replace(/[^0-9./]/g, '');
+    }
+    
     function showPage(pageId) {
         vpnPage.classList.add('hidden');
         startPage.classList.add('hidden');
@@ -400,12 +444,14 @@
         messageBox.classList.remove('show');
         
         // 根據題目類型顯示不同介面
+        inputGroup.classList.add('hidden');
+        choiceGroup.classList.add('hidden');
+        multipleInputGroup.classList.add('hidden');
+        
         if (levelData.type === 'input') {
             inputGroup.classList.remove('hidden');
-            choiceGroup.classList.add('hidden');
             answerInput.value = '';
         } else if (levelData.type === 'choice') {
-            inputGroup.classList.add('hidden');
             choiceGroup.classList.remove('hidden');
             choiceGroup.innerHTML = ''; // 清空舊選項
             levelData.options.forEach((option, index) => {
@@ -422,6 +468,12 @@
                 choiceGroup.appendChild(button);
             });
             selectedChoice = null;
+        } else if (levelData.type === 'multiple_input') {
+            multipleInputGroup.classList.remove('hidden');
+            answerInput1.value = '';
+            answerInput2.value = '';
+            answerInput1.placeholder = levelData.answer_placeholder[0];
+            answerInput2.placeholder = levelData.answer_placeholder[1];
         }
     }
 
@@ -467,10 +519,18 @@
         let isCorrect = false;
 
         if (levelData.type === 'input') {
-            const userAnswer = answerInput.value.trim().toLowerCase();
-            isCorrect = levelData.answer.some(correctAnswer => userAnswer === correctAnswer.trim().toLowerCase());
+            const userAnswer = toHalfWidth(answerInput.value).trim().toLowerCase();
+            isCorrect = levelData.answer.some(correctAnswer => userAnswer === toHalfWidth(correctAnswer).trim().toLowerCase());
         } else if (levelData.type === 'choice') {
             isCorrect = (selectedChoice === levelData.answer);
+        } else if (levelData.type === 'multiple_input') {
+            const userAnswer1 = toHalfWidth(answerInput1.value).trim().toLowerCase();
+            const userAnswer2 = toHalfWidth(answerInput2.value).trim().toLowerCase();
+            
+            const normalizedAnswer2 = userAnswer2.replace(/\s+/g, '').replace('q', '').replace('Ｑ', ''); // 移除空格和Q
+            const correctAnswers2 = levelData.answers[1].toLowerCase().replace(/\s+/g, '');
+
+            isCorrect = (userAnswer1 === levelData.answers[0].toLowerCase() && (normalizedAnswer2 === correctAnswers2 || normalizedAnswer2 === '2'));
         }
 
         if (isCorrect) {
@@ -523,8 +583,12 @@
         showPage('user-info-page');
     });
     
+    userIdInput.addEventListener('input', (e) => {
+        e.target.value = toHalfWidth(e.target.value);
+    });
+
     userInfoSubmitButton.addEventListener('click', () => {
-        const userId = userIdInput.value.trim();
+        const userId = removeNonDigits(userIdInput.value.trim());
         if (userId === '') {
             showMessage(userInfoMessageBox, 'error', '卡號或身份證號碼不能為空，請輸入。');
             container.classList.add('shaking');
@@ -553,9 +617,20 @@
     copyButton.addEventListener('click', () => {
         const userInfo = getUserInfo();
         if (userInfo && userInfo.completed) {
-            const copyText = `闖關完成證明\n完成時間: ${userInfo.completedDate}\n玩家代碼: ${userInfo.id}`;
+            const now = new Date();
+            const yearStr = now.getFullYear().toString().slice(-2);
+            const monthStr = (now.getMonth() + 1).toString().padStart(2, '0');
+            const dateStr = now.getDate().toString().padStart(2, '0');
+            const hoursStr = now.getHours().toString().padStart(2, '0');
+            const minutesStr = now.getMinutes().toString().padStart(2, '0');
+            const secondsStr = now.getSeconds().toString().padStart(2, '0');
+
+            const timeCode = `${yearStr}${monthStr}${dateStr}${hoursStr}${minutesStr}${secondsStr}`;
+            const combinedString = `${timeCode}${userInfo.id}`;
+
+            // 將憑證複製到剪貼簿
             const tempInput = document.createElement('textarea');
-            tempInput.value = copyText;
+            tempInput.value = combinedString;
             document.body.appendChild(tempInput);
             tempInput.select();
             document.execCommand('copy');
@@ -573,12 +648,21 @@
 
     formButton.addEventListener('click', () => {
         const userInfo = getUserInfo();
-        const combinedString = `${userInfo.completedDate} ${userInfo.id}`;
-        
-        // Google Form 預填欄位
-        const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSfypsblR_Wy_6-W5lK-SH8FWkuKw29qxuX-z1srrijOQgq-ug/viewform?usp=sharing&entry.1488005670=${encodeURIComponent(combinedString)}`;
-        
-        window.open(formUrl, '_blank');
+        if (userInfo && userInfo.completed) {
+            const now = new Date();
+            const yearStr = now.getFullYear().toString().slice(-2);
+            const monthStr = (now.getMonth() + 1).toString().padStart(2, '0');
+            const dateStr = now.getDate().toString().padStart(2, '0');
+            const hoursStr = now.getHours().toString().padStart(2, '0');
+            const minutesStr = now.getMinutes().toString().padStart(2, '0');
+            const secondsStr = now.getSeconds().toString().padStart(2, '0');
+            
+            const timeCode = `${yearStr}${monthStr}${dateStr}${hoursStr}${minutesStr}${secondsStr}`;
+            const combinedString = `${timeCode}${userInfo.id}`;
+            const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSfypsblR_Wy_6-W5lK-SH8FWkuKw29qxuX-z1srrijOQgq-ug/viewform?usp=sharing&entry.1488005670=${encodeURIComponent(combinedString)}`;
+            
+            window.open(formUrl, '_blank');
+        }
     });
 
     window.onload = () => {
